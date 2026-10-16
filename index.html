@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>春酒・尾牙 需求探索</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1a1a1a;--mut:#77756f;--card:#fff;--line:#e6e4de;--acc:#c8402a;--accfg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131312;--fg:#f2f1ed;--mut:#9b9992;--card:#1d1d1b;--line:#33322f;--acc:#ec6a52;--accfg:#1a1a1a}}
+:root[data-theme="dark"]{--bg:#131312;--fg:#f2f1ed;--mut:#9b9992;--card:#1d1d1b;--line:#33322f;--acc:#ec6a52;--accfg:#1a1a1a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+#app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:16px 20px 20px}
+.bar{height:3px;background:var(--line);border-radius:2px;margin:8px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:2px;transition:width .4s}
+.cnt{font-size:13px;color:var(--mut);letter-spacing:.05em;min-height:20px}
+main{flex:1;animation:in .35s ease;padding:18px 0}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+h1{font-size:30px;line-height:1.3;margin:12vh 0 12px;font-weight:700;letter-spacing:.02em}
+h2{font-size:23px;line-height:1.4;margin:0 0 6px;font-weight:700}
+.sub{color:var(--mut);font-size:14px;margin:0 0 20px}
+.grid{display:grid;gap:10px}.g2{grid-template-columns:1fr 1fr}
+.opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s;position:relative}
+.opt:active{transform:scale(.97)}
+.opt.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 9%,var(--card))}
+.opt small{display:block;color:var(--mut);font-size:12px}
+.opt .n{margin-left:auto;min-width:24px;height:24px;border-radius:12px;background:var(--acc);color:var(--accfg);font-size:13px;display:none;align-items:center;justify-content:center}
+.opt.on .n{display:flex}
+.lab{font-size:14px;font-weight:600;margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px}
+.chip.on{border-color:var(--acc);background:var(--acc);color:var(--accfg)}
+.big{font-size:56px;font-weight:700;line-height:1.1;margin:10px 0;font-variant-numeric:tabular-nums}
+.big span{font-size:16px;color:var(--mut);font-weight:400;margin-left:6px}
+input[type=range]{width:100%;accent-color:var(--acc);height:32px}
+.ends{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.sl{margin:0 0 22px}
+input[type=text],input[type=tel],textarea{width:100%;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;outline:none}
+input:focus,textarea:focus{border-color:var(--acc)}
+textarea{min-height:90px;resize:none}
+footer{display:flex;gap:10px;padding-top:8px}
+.btn{flex:1;font:inherit;font-weight:600;border:0;border-radius:14px;padding:15px;background:var(--acc);color:var(--accfg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line);flex:.45}
+.btn:disabled{opacity:.35}
+.sum{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:20px}
+.sum h3{margin:0 0 4px;font-size:20px}
+.row{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.row b{flex:0 0 76px;color:var(--mut);font-weight:500}
+.hint{background:color-mix(in srgb,var(--acc) 10%,var(--card));border-radius:12px;padding:10px 14px;font-size:13px;margin:12px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tags span{background:var(--acc);color:var(--accfg);border-radius:999px;padding:3px 12px;font-size:13px}
+.acts{display:grid;gap:10px;margin-top:14px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar"><i id="pg"></i></div>
+  <div class="cnt" id="cnt"></div>
+  <main id="m"></main>
+  <footer id="f"></footer>
+</div>
+<script>
+var KEY='banquet-brief-v1',S={},i=0;
+try{var sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv){S=sv.S||{}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({S:S}))}catch(e){}}
+var MAIL='';
+var Q=[
+{k:'type',t:'這次是哪一種活動？',type:'single',o:['春酒','尾牙','春酒＋尾牙合併','其他']},
+{k:'pax',t:'預計多少人參加？',sub:'拖曳滑桿，大概就好',type:'range'},
+{k:'budget',t:'每人預算大約落在哪？',sub:'以「每人」估算比較容易回答',type:'single',o:['1,000 元以下','1,000–2,000 元','2,000–3,500 元','3,500 元以上','想先聽聽建議']},
+{k:'vibe',t:'心目中的氛圍像哪一種？',sub:'可複選',type:'multi',max:3,o:[['溫馨家庭感','像一家人圍爐'],['高端晚宴','質感、有儀式感'],['熱血嘉年華','全場嗨起來'],['復古懷舊','老派浪漫'],['文青輕鬆','簡約自在'],['傳統喜慶','紅紅火火']]},
+{k:'goal',t:'今年最想達成什麼？',sub:'最多選 2 項',type:'multi',max:2,o:['犒賞員工','凝聚向心力','跨部門交流','展現公司成績','發布新年度願景','單純放鬆開心']},
+{k:'items',t:'想加入哪些節目？',sub:'依序點選：越先點越重要（可略過）',type:'rank',o:['摸彩抽獎','現場表演','團康遊戲','主管致詞','員工影片','互動拍照區','才藝表演','主持人帶動']},
+{k:'tone',t:'現場節奏想要多熱鬧？',type:'sliders',o:[['formal','正式','輕鬆'],['loud','安靜','熱鬧'],['join','看表演','自己參與']]},
+{k:'more',t:'時間、場地與在意的事',sub:'都可以先略過',type:'combo',g:[['month','預計月份',['1月','2月','3月','其他','未定']],['venue','場地狀態',['已有場地','需要推薦','公司內舉辦']]]},
+{k:'contact',t:'最後，怎麼聯絡您？',sub:'留下資料，我們會依這份輪廓為您規劃',type:'contact'}
+];
+var N=Q.length;
+var m=document.getElementById('m'),f=document.getElementById('f');
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
+function ok(q){var v=S[q.k];
+ if(q.type=='single')return !!v;
+ if(q.type=='multi')return v&&v.length>0;
+ if(q.type=='contact')return v&&v.name&&v.name.trim()&&((v.phone&&v.phone.trim())||(v.email&&v.email.trim()));
+ return true}
+function go(n){i=n;save();draw();window.scrollTo(0,0)}
+function draw(){
+ m.innerHTML='';f.innerHTML='';
+ var pg=document.getElementById('pg'),cnt=document.getElementById('cnt');
+ if(i<0){pg.style.width='0';cnt.textContent='';cover();return}
+ if(i>=N){pg.style.width='100%';cnt.textContent='完成';summary();return}
+ pg.style.width=(i+1)/N*100+'%';cnt.textContent='第 '+(i+1)+' / '+N+' 題'+(i>=N-2?'・快完成了':'');
+ var q=Q[i];m.appendChild(el('h2',0,q.t));m.appendChild(el('p','sub',q.sub||''));
+ R[q.type](q);
+ var b=el('button','btn ghost','上一步');b.onclick=function(){go(i-1)};f.appendChild(b);
+ var nx=el('button','btn',i==N-1?'產生需求輪廓':'下一步');nx.id='nx';nx.disabled=!ok(q);nx.onclick=function(){go(i+1)};f.appendChild(nx);
+}
+function upd(){var n=document.getElementById('nx');if(n)n.disabled=!ok(Q[i])}
+function cover(){
+ m.appendChild(el('h1',0,'3 分鐘，把你想像中的尾牙變成企劃'));
+ m.appendChild(el('p','sub','輕鬆點幾下，我們就能懂你要的春酒／尾牙，並整理成一張專屬需求輪廓。'));
+ var b=el('button','btn',(S.type||S.contact)?'繼續上次的進度':'開始');b.onclick=function(){go(0)};f.appendChild(b);
+ if(S.type||S.contact){var r=el('button','btn ghost','重新開始');r.onclick=function(){S={};save();go(0)};f.appendChild(r)}
+}
+var R={
+single:function(q){var g=el('div','grid');q.o.forEach(function(o){var b=el('button','opt'+(S[q.k]==o?' on':''),o);b.onclick=function(){buzz();S[q.k]=o;save();[].forEach.call(g.children,function(c){c.classList.remove('on')});b.classList.add('on');upd();setTimeout(function(){go(i+1)},260)};g.appendChild(b)});m.appendChild(g)},
+multi:function(q){var g=el('div','grid g2');var a=S[q.k]=S[q.k]||[];q.o.forEach(function(o){var nm=o[0]||o,d=o[1]||'';var b=el('button','opt'+(a.indexOf(nm)>-1?' on':''));var s=el('span',0,nm);if(d)s.appendChild(el('small',0,d));b.appendChild(s);
+ b.onclick=function(){buzz();var x=a.indexOf(nm);if(x>-1)a.splice(x,1);else{if(a.length>=q.max)a.shift();a.push(nm)}save();draw()};g.appendChild(b)});m.appendChild(g)},
+rank:function(q){var g=el('div','grid g2');var a=S[q.k]=S[q.k]||[];q.o.forEach(function(o){var x=a.indexOf(o);var b=el('button','opt'+(x>-1?' on':''),o);var n=el('span','n',x>-1?x+1:'');b.appendChild(n);
+ b.onclick=function(){buzz();var y=a.indexOf(o);if(y>-1)a.splice(y,1);else a.push(o);save();draw()};g.appendChild(b)});m.appendChild(g)},
+range:function(q){if(S.pax==null)S.pax=100;var big=el('div','big');var sp=el('span',0,'人');var sl=document.createElement('input');sl.type='range';sl.min=20;sl.max=500;sl.step=10;sl.value=S.pax==='?'?100:S.pax;
+ function sh(){big.textContent=S.pax==='?'?'未定':(S.pax>=500?'500+':S.pax);if(S.pax!=='?')big.appendChild(sp)}
+ sl.oninput=function(){S.pax=+sl.value;un.classList.remove('on');sh();save()};
+ var un=el('button','chip'+(S.pax==='?'?' on':''),'還不確定');un.onclick=function(){S.pax='?';un.classList.add('on');sh();save()};
+ m.appendChild(big);m.appendChild(sl);var e=el('div','ends');e.appendChild(el('span',0,'20 人'));e.appendChild(el('span',0,'500+ 人'));m.appendChild(e);var w=el('div','lab');w.appendChild(un);m.appendChild(w);sh()},
+sliders:function(q){var t=S.tone=S.tone||{};q.o.forEach(function(o){var w=el('div','sl');var s=document.createElement('input');s.type='range';s.min=1;s.max=5;s.value=t[o[0]]||3;t[o[0]]=+s.value;s.oninput=function(){t[o[0]]=+s.value;save()};w.appendChild(s);var e=el('div','ends');e.appendChild(el('span',0,o[1]));e.appendChild(el('span',0,o[2]));w.appendChild(e);m.appendChild(w)})},
+combo:function(q){q.g.forEach(function(g){m.appendChild(el('div','lab',g[1]));var c=el('div','chips');g[2].forEach(function(o){var b=el('button','chip'+(S[g[0]]==o?' on':''),o);b.onclick=function(){S[g[0]]=S[g[0]]==o?null:o;save();draw()};c.appendChild(b)});m.appendChild(c)});
+ m.appendChild(el('div','lab','有沒有特別擔心，或過去踩過的雷？（選填）'));var t=document.createElement('textarea');t.placeholder='例如：去年現場冷場、長官很重視抽獎…';t.value=S.worry||'';t.oninput=function(){S.worry=t.value;save()};m.appendChild(t)},
+contact:function(q){var c=S.contact=S.contact||{};[['company','公司名稱','text'],['name','窗口姓名＊','text'],['title','職稱','text'],['phone','手機','tel'],['email','Email','text']].forEach(function(o){var x=document.createElement('input');x.type=o[2];x.placeholder=o[1];x.value=c[o[0]]||'';x.oninput=function(){c[o[0]]=x.value;save();upd()};m.appendChild(x)});
+ m.appendChild(el('div','lab','方便聯絡時段'));var ch=el('div','chips');['上午','下午','晚上','皆可'].forEach(function(o){var b=el('button','chip'+(c.time==o?' on':''),o);b.onclick=function(){c.time=o;save();[].forEach.call(ch.children,function(z){z.classList.remove('on')});b.classList.add('on')};ch.appendChild(b)});m.appendChild(ch);
+ m.appendChild(el('p','sub','＊必填；手機與 Email 擇一即可'))}
+};
+function lv(v,a,b){return v<=2?a:v>=4?b:'適中'}
+function rows(){
+ var t=S.tone||{},c=S.contact||{},r=[];
+ r.push(['活動',S.type||'—']);
+ r.push(['人數',S.pax==='?'?'尚未確定':(S.pax>=500?'500+ 人':S.pax+' 人')]);
+ r.push(['預算',S.budget||'—']);
+ r.push(['氛圍',(S.vibe||[]).join('、')||'—']);
+ r.push(['目的',(S.goal||[]).join('、')||'—']);
+ r.push(['節目',(S.items||[]).map(function(x,n){return (n+1)+'.'+x}).join(' ')||'交由我們建議']);
+ r.push(['節奏',lv(t.formal,'正式','輕鬆')+'・'+lv(t.loud,'安靜','熱鬧')+'・'+lv(t.join,'看表演為主','高參與')]);
+ r.push(['時間場地',[S.month,S.venue].filter(Boolean).join('／')||'未定']);
+ if(S.worry&&S.worry.trim())r.push(['在意的事',S.worry.trim()]);
+ r.push(['聯絡',[c.company,c.name,c.title].filter(Boolean).join(' ')+'｜'+[c.phone,c.email].filter(Boolean).join(' / ')+(c.time?'｜'+c.time:'')]);
+ return r}
+function txt(){return '【春酒／尾牙需求輪廓】\n'+rows().map(function(r){return r[0]+'：'+r[1]}).join('\n')}
+function summary(){
+ var s=el('div','sum');s.appendChild(el('h3',0,'你的活動輪廓'));
+ var tg=el('div','tags');(S.vibe||[]).concat(S.type?[S.type]:[]).forEach(function(x){tg.appendChild(el('span',0,x))});s.appendChild(tg);
+ rows().forEach(function(r){var d=el('div','row');d.appendChild(el('b',0,r[0]));d.appendChild(el('span',0,r[1]));s.appendChild(d)});
+ m.appendChild(s);
+ if(S.budget=='1,000 元以下'&&(S.vibe||[]).indexOf('高端晚宴')>-1)m.appendChild(el('div','hint','小提醒：預算與「高端晚宴」可能需要取捨，我們會協助評估可行做法。'));
+ var a=el('div','acts');
+ var send=el('a','btn','寄給我們的企劃顧問');send.style.cssText='text-align:center;text-decoration:none';send.href='mailto:'+MAIL+'?subject='+encodeURIComponent('春酒尾牙需求輪廓')+'&body='+encodeURIComponent(txt());a.appendChild(send);
+ var cp=el('button','btn ghost','複製內容');cp.style.flex='none';cp.onclick=function(){try{navigator.clipboard.writeText(txt()).then(function(){cp.textContent='已複製 ✓'},function(){cp.textContent='請長按截圖保存'})}catch(e){cp.textContent='請長按截圖保存'}};a.appendChild(cp);
+ var ed=el('button','btn ghost','修改答案');ed.style.flex='none';ed.onclick=function(){go(0)};a.appendChild(ed);
+ m.appendChild(a)}
+draw();i=-1;draw();
+</script>
+</body>
+</html>
